@@ -850,16 +850,15 @@ class Entities{
         void EntitiesMovement(Grid *grid){
             vector<vampire *>::iterator viter;
             vector<werewolf *>::iterator witer;
-            TeammateVector = ent->GetWerewolves();
-            for(witer = TeammateVector.begin(); witer != TeammateVector.end(); ++witer){
-                (*witer)->UpdateHealthState(MAX_HEALTH);
+            for(viter = this->VampVector.begin(); viter != this->VampVector.end(); ++viter){
+                (*viter)->VampireMovement(grid);
             }
+            for(witer = this->WolfVector.begin(); witer != this->WolfVector.end(); ++witer){
+                (*witer)->WerewolfMovement(grid);
+            }            
         }
-        this->DecreasePotions();
-    }
-        
-    return;
-}
+  
+};
 
 //this class displays the game's statistics after the player pauses the game
 class Statistics{
