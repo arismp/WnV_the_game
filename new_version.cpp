@@ -207,12 +207,8 @@ class character{
         char GetSpecies(){ return this->Species; }      
 };
 
-<<<<<<< HEAD
 class Entities;
  
-=======
-//the vmapire class 
->>>>>>> a2382c9ceb898c2b818c418f8e0b1572afbb14d5
 class vampire: public character{
     private:
         int health; 
@@ -224,7 +220,7 @@ class vampire: public character{
 
     public:
 
-        vampire(){   //constructor
+        vampire(){
             this->pos = new Position();
             this->id = -1;
             this->health = MAX_HEALTH;
@@ -235,11 +231,11 @@ class vampire: public character{
             this->SetSpecies(VAMPIRE);
         }
 
-        ~vampire(){ }; //destructor 
+        ~vampire(){ };
 
         void UpdatePosition(int x,int y){ this->pos->SetNewPosition(x,y); }
+        void UpdateHealthState(int h){ this->health = h; }
         
-        //this function places the vampire in a random position in the grid(loop while a random position is empty)
         void StartingPoint(Grid *grid){ 
             srand(time(NULL));
             int randX,randY;
@@ -251,10 +247,8 @@ class vampire: public character{
             UpdatePosition(randX,randY);  
         }
 
-        //this function returns the vampire's position 
         Position *GetPosition(){ return this->pos; }
 
-        //get vampire's health,power,defense
         int GetHealthState(){ return this->health; }
         int GetPower(){ return this->power; }
         int GetDefense(){ return this->defense; }
@@ -267,11 +261,7 @@ class vampire: public character{
             return false;
         }
 
-        //this function checks if a movement is legal for the vampire to make 
-        //the vapmire isn't able to go through trees or water puddles 
-        //is not able to go through other entities or the player
-        //is not able to go outside the grid 
-        //if a movement is illegal then the function returns false and true if legal 
+
         bool isLegalMovement(char mov,Grid *grid){
             bool flag = true;
             switch(mov){
@@ -341,7 +331,6 @@ class vampire: public character{
             return rand() % 8;
         }
         
-        //vampire's normal movement ( up , down , right , left)
         void NormalMovement(int movement,Grid *grid){
             switch(movement){
                 case 1: //move UP
@@ -375,7 +364,6 @@ class vampire: public character{
             }
         }
 
-        //vampire's diagonal movement (up-rigth , up-left , down-right , down-left)
         void DiagonalMovement(int movement,Grid *grid){
             switch(movement){
                 case 5: //move UP-RIGHT
@@ -409,9 +397,6 @@ class vampire: public character{
             }
         }
 
-        //function that controls the vampire's movement
-        //if the randomly picked movement is 1-4 then the vampire does a normal movement 
-        //if the randomly picked movement is 5-8 then the vampire does a diagonal movement 
         void VampireMovement(Grid *gptr){
             int mov = Pick_Random_Movement();
             if(mov <= 4) NormalMovement(mov,gptr);
@@ -426,11 +411,7 @@ class vampire: public character{
 
 
         void Heal(int x, int y){
-<<<<<<< HEAD
             
-=======
-            vector<vampire *> TeammateVector = ent->GetVampires();
->>>>>>> a2382c9ceb898c2b818c418f8e0b1572afbb14d5
 
         }
 
@@ -448,7 +429,6 @@ class vampire: public character{
 
 };
 
-//the werewolf class
 class werewolf: public character{
     private:
         int health;
@@ -458,7 +438,7 @@ class werewolf: public character{
         int id;
         Position *pos;        
     public:
-        werewolf(){ //constructor 
+        werewolf(){
             this->pos = new Position();
             this->id = -1;
             this->health = MAX_HEALTH;
@@ -469,23 +449,17 @@ class werewolf: public character{
             this->SetSpecies(WEREWOLF);  
         }   
 
-        ~werewolf(){ } //destructor 
-
-        //get werewolf's health,power,defense
         int GetHealthState(){ return this->health; }
         int GetPower(){ return this->power; }
         int GetDefense(){ return this->defense; }     
         int GetPotions(){ return this->potions; } 
 
-        //update the werewolf's position after each movement 
         void UpdatePosition(int x,int y){ this->pos->SetNewPosition(x,y); }
         void UpdateHealthState(int h){ this->health = h; }
 
-        //get werewolf's position in the grid 
         Position *GetPosition(){ return this->pos; }
 
-        //this function places the werewolf in a random position in the grid(loop while a random position is empty)
-        void StartingPoint(Grid *grid){  
+        void StartingPoint(Grid *grid){ //move this in the charachter class  
             srand(time(NULL));
             int randX,randY;
             do{
@@ -502,7 +476,6 @@ class werewolf: public character{
             if(x == 0 || y == 0 || x == grid->getX()-1 || y == grid->getY()-1) return true;
             return false;
         }       
-
 
         bool isLegalMovement(char mov,Grid *grid){
             bool flag = true;
@@ -542,7 +515,6 @@ class werewolf: public character{
 
 
         int Pick_Random_Movement(){ 
-        //this function picks a random movement
             //srand(time(NULL));
             return rand() % 4;
         }        
@@ -680,20 +652,20 @@ class Entities{
 
                 (*viter)->CheckSourroundings(grid, AdjType, AdjPos);
 
-                // for(int i=0; i<4; i++){
-                //     if(AdjType[i] == VAMPIRE){
-                //         (*viter)->Heal(curPotions,4);
-                //     }
-                //     else if(AdjType[i] == WEREWOLF){
-                //         if
+                for(int i=0; i<4; i++){
+                    if(AdjType[i] == VAMPIRE){
+                        (*viter)->Heal(curPotions,4);
+                    }
+                    else if(AdjType[i] == WEREWOLF){
+                        if
 
 
 
-                //     }
+                    }
 
 
 
-                // }
+                }
 
 
 
@@ -864,90 +836,69 @@ class avatar: public character{
 
 void avatar::Heal_Team(Entities *ent,Grid *grid){
 
+    
+    char Team = this->GetTeam();
+    char Time = grid->GetTime();
+    int Potions = this->GetPotions();
 
-//this class will store all the vampires and the werewolves of the game 
-class Entities{
-    private:
-        int VampCount;
-        int WolfCount;
-        vector<vampire *> VampVector;
-        vector<werewolf *> WolfVector;
-
-    public:
-        Entities(){
-            this->VampCount = 0;
-            this->WolfCount = 0;
-        }
-        void CreateEntities(Grid *grid){
-            vampire *vptr = NULL;
-            werewolf *wptr = NULL;
-            for(int i=0;i<grid->TotalEntitiesNum();i++){
-                vptr = new vampire();
-                vptr->StartingPoint(grid);
-                wptr = new werewolf();
-                wptr->StartingPoint(grid);
-                VampVector.push_back(vptr);
-                WolfVector.push_back(wptr);
-            }
-        }
-        //also create a destructor
-
-        void UpdateCount(){
-            this->WolfCount = this->WolfVector.size();
-            this->VampCount = this->VampVector.size();
-        }
-
-        int GetVampCount(){ return this->VampCount; }
-        int GetWolfCount(){ return this->WolfCount; }
-
-        void EntitiesMovement(Grid *grid){
+    if(Potions > 0){
+        if (Team == 'V' && Time == 'N'){
+            vector<vampire *> TeammateVector;
             vector<vampire *>::iterator viter;
-            vector<werewolf *>::iterator witer;
-            for(viter = this->VampVector.begin(); viter != this->VampVector.end(); ++viter){
-                (*viter)->VampireMovement(grid);
+            TeammateVector = ent->GetVampires();
+            for(viter = TeammateVector.begin(); viter != TeammateVector.end(); ++viter){
+                (*viter)->UpdateHealthState(MAX_HEALTH);
             }
-            for(witer = this->WolfVector.begin(); witer != this->WolfVector.end(); ++witer){
-                (*witer)->WerewolfMovement(grid);
-            }            
         }
-  
-};
+        else if(Team == 'W' && Time == 'D'){
+            vector<werewolf *> TeammateVector;
+            vector<werewolf *>::iterator witer;
+            TeammateVector = ent->GetWerewolves();
+            for(witer = TeammateVector.begin(); witer != TeammateVector.end(); ++witer){
+                (*witer)->UpdateHealthState(MAX_HEALTH);
+            }
+        }
+        this->DecreasePotions();
+    }
+        
+    return;
+}
 
-//this class displays the game's statistics after the player pauses the game
+
 class Statistics{
     private:
         int VampiresNum;  //number of active vampires 
         int WerewolvesNum; //number of active werewolves
         int PotionsNum; //number of potions that the player has 
     public:
-        Statistics(){ //construstor 
+        Statistics(){
             this->VampiresNum=0;
             this->WerewolvesNum=0;
             this->PotionsNum=0;
         }
-        ~Statistics(){ } //destrustor 
-        
         void CountVampires(Entities *en){
             en->UpdateCount();
             this->VampiresNum = en->GetVampCount();
         }
-
         void CountWerewolves(Entities *en){
             en->UpdateCount();
             this->WerewolvesNum = en->GetWolfCount();
         } 
-
+        void Refresh(){
+            this->VampiresNum = 0;
+            this->WerewolvesNum = 0;
+            this->WerewolvesNum = 0;            
+        }
         void CountPotions(int potions){ this->PotionsNum = potions; }
         int getVampNum(){ return this->VampiresNum; }  
         int getWereNum(){ return this->WerewolvesNum; }
         int getPotionsNum(){ return this->PotionsNum; } 
-        
-        //display the game's statistics
         void ShowStats(){
             system("stty cooked");
             cout<<"The number of active vampires is : "<<this->getVampNum()<<endl;
             cout<<"The number of active werewolves is : "<<this->getWereNum()<<endl;
             cout<<"The number of potions the player has is : "<<this->getPotionsNum()<<endl;
+            Refresh();
             return;
         }      
 
@@ -967,7 +918,7 @@ Grid CreateWorld(int x,int y){
     return grd1;
 }
 
-//the game class that controls the actual game
+
 class Game{
     private:
         bool flag; //flag that handles the gameplay loop 
@@ -979,7 +930,6 @@ class Game{
         void GamePlay(Grid *gptr,avatar *player,Entities * ent);
 };
 
-//this function allows the game to start only when the player presses 'S'
 void Game::Start(){
     cout << "To start the game press S..."<<endl;
     char in;
@@ -990,12 +940,10 @@ void Game::Start(){
     }    
 }
 
-//this function allows the game to resume only when the player presses 'R'
 void Game::Resume(avatar *player){
     while(player->PlayerInput()!= 'R') cout << "Need to press 'R' to resume the game!"<<endl; 
 }
 
-//when the player presses 'P' the game is paused and the game's statistics are in display
 void Game::Pause(Entities *en,Statistics *stats,avatar * player){
     char input;
     stats->CountVampires(en);
@@ -1004,8 +952,7 @@ void Game::Pause(Entities *en,Statistics *stats,avatar * player){
     stats->ShowStats();    
 }
 
-//this function controls the actual gameplay 
-//it has a while loop that loops until the player presses 'Q' 
+//pass a vector pointer for each entity in this function
 void Game::GamePlay(Grid *gptr,avatar *player,Entities * ent){
 
     this->flag=true;  
@@ -1047,7 +994,6 @@ void Game::GamePlay(Grid *gptr,avatar *player,Entities * ent){
             //ent->EntitiesAction(gptr);
             //increase the cycle count after each frame
             gptr->IncreaseCycleCount();
-            //render 
             gptr->ShowGrid();
             //usleep(100000); 
             usleep(50000);

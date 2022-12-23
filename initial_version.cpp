@@ -18,7 +18,6 @@ const char LEFT = 68; //left movement
 const int MAX_POWER = 3;  //maximum power is 3
 const int MAX_HEALTH = 3; //maximum health is 3
 const int MAX_DEFENSE = 3; //maximum defense is 3
-const int MAX_POTIONS = 2; //maximum number of potions is 2 
 
 const char WEREWOLF = 'w'; 
 const char VAMPIRE = 'v';
@@ -90,8 +89,6 @@ class Grid{
             else cout << "NIGHT";
             cout << endl;
         }
-
-        char GetTime(){ return this->Day_n_Night_Cycle; }
         
         void ShowGrid(){  //print the grid 
             system("stty cooked"); //set the terminal to cooked mode
@@ -158,7 +155,7 @@ class Grid{
                     randX=rand()%this->x;
                     randY=rand()%this->y;
                 }while(CheckPlace(randX,randY)==false); 
-                this->grid[randX][randY]='=';    
+                this->grid[randX][randY]='W';    
             }
         }
 
@@ -207,39 +204,31 @@ class character{
         char GetSpecies(){ return this->Species; }      
 };
 
-<<<<<<< HEAD
-class Entities;
  
-=======
-//the vmapire class 
->>>>>>> a2382c9ceb898c2b818c418f8e0b1572afbb14d5
 class vampire: public character{
     private:
         int health; 
         int power;
         int defense;
-        int potions;
         int id;
         Position *pos;
 
     public:
 
-        vampire(){   //constructor
+        vampire(){
             this->pos = new Position();
             this->id = -1;
             this->health = MAX_HEALTH;
             srand(time(NULL));
             this->power = rand()%MAX_POWER;
             this->defense = rand()%MAX_DEFENSE;
-            this->potions = rand()%MAX_POTIONS;
             this->SetSpecies(VAMPIRE);
         }
 
-        ~vampire(){ }; //destructor 
+        ~vampire(){ };
 
         void UpdatePosition(int x,int y){ this->pos->SetNewPosition(x,y); }
         
-        //this function places the vampire in a random position in the grid(loop while a random position is empty)
         void StartingPoint(Grid *grid){ 
             srand(time(NULL));
             int randX,randY;
@@ -251,81 +240,74 @@ class vampire: public character{
             UpdatePosition(randX,randY);  
         }
 
-        //this function returns the vampire's position 
         Position *GetPosition(){ return this->pos; }
 
-        //get vampire's health,power,defense
         int GetHealthState(){ return this->health; }
         int GetPower(){ return this->power; }
         int GetDefense(){ return this->defense; }
-        int GetPotions(){ return this->potions; }
 
-        bool isInBoundary(Grid *grid){
+        bool isInBoundry(Grid *grid){
             int x = pos->GetPosition()->x;
             int y = pos->GetPosition()->y;
             if(x == 0 || y == 0 || x == grid->getX()-1 || y == grid->getY()-1) return true;
             return false;
         }
 
-        //this function checks if a movement is legal for the vampire to make 
-        //the vapmire isn't able to go through trees or water puddles 
-        //is not able to go through other entities or the player
-        //is not able to go outside the grid 
-        //if a movement is illegal then the function returns false and true if legal 
+
         bool isLegalMovement(char mov,Grid *grid){
             bool flag = true;
             switch(mov){
                 case 1: //UP
-                    if(isInBoundary(grid) && pos->GetPosition()->x == 0 ){
+                    if(isInBoundry(grid) && pos->GetPosition()->x == 0 ){
                         flag = false;
                         break;
                     }
                     if(!grid->CheckPlace(pos->GetPosition()->x-1,pos->GetPosition()->y)) flag = false;                    
                     break;
                 case 2: //DOWN
-                    if(isInBoundary(grid) && pos->GetPosition()->x == grid->getX()-1){
+                    if(isInBoundry(grid) && pos->GetPosition()->x == grid->getX()-1){
                         flag = false;
                         break;
                     }
                     if(!grid->CheckPlace(pos->GetPosition()->x+1,pos->GetPosition()->y)) flag = false;                
                     break;
                 case 3: //RIGHT
-                     if(isInBoundary(grid) && pos->GetPosition()->y == grid->getY()-1){
+                     if(isInBoundry(grid) && pos->GetPosition()->y == grid->getY()-1){
                         flag = false;
                         break;
                     }
                     if(!grid->CheckPlace(pos->GetPosition()->x,pos->GetPosition()->y+1)) flag = false;               
                     break;
                 case 4: //LEFT
-                    if(isInBoundary(grid) && pos->GetPosition()->y == 0){
+                    if(isInBoundry(grid) && pos->GetPosition()->y == 0){
                         flag = false;
                         break;
                     }
                     if(!grid->CheckPlace(pos->GetPosition()->x,pos->GetPosition()->y-1)) flag = false;                
                     break;
                 case 5: //UP-RIGHT
-                    if(isInBoundary(grid) && (pos->GetPosition()->x == 0 || pos->GetPosition()->y == grid->getY()-1)){
+                    if(isInBoundry(grid) && (pos->GetPosition()->x == 0 || pos->GetPosition()->y == grid->getY()-1)){
                         flag = false;
                         break;
                     }
                     if(!grid->CheckPlace(pos->GetPosition()->x-1,pos->GetPosition()->y+1)) flag = false;                 
                     break;
                 case 6: //UP-LEFT
-                    if(isInBoundary(grid) && (pos->GetPosition()->x == 0 || pos->GetPosition()->y == 0)){
+                    if(isInBoundry(grid) && (pos->GetPosition()->x == 0 || pos->GetPosition()->y == 0)){
                         flag = false;
                         break;
                     }
                     if(!grid->CheckPlace(pos->GetPosition()->x-1,pos->GetPosition()->y-1)) flag = false;                
                     break;
                 case 7: //DOWN-RIGHT
-                    if(isInBoundary(grid) && (pos->GetPosition()->x == grid->getX()-1 || pos->GetPosition()->y == grid->getY()-1)){
+                    if(isInBoundry(grid) && (pos->GetPosition()->x == grid->getX()-1 || pos->GetPosition()->y == grid->getY()-1)){
                         flag = false;
                         break;
                     }
                     if(!grid->CheckPlace(pos->GetPosition()->x+1,pos->GetPosition()->y+1)) flag = false;                
                     break;
                 case 8: //DOWN-LEFT
-                    if(isInBoundary(grid) && (pos->GetPosition()->x == grid->getX()-1 || pos->GetPosition()->y == 0)){
+                    if(isInBoundry(grid) && (pos->GetPosition()->x == grid->getX()-1 || pos->GetPosition()->y == 0)){
                         flag = false;
                         break;
                     }
@@ -341,7 +323,6 @@ class vampire: public character{
             return rand() % 8;
         }
         
-        //vampire's normal movement ( up , down , right , left)
         void NormalMovement(int movement,Grid *grid){
             switch(movement){
                 case 1: //move UP
@@ -375,7 +356,6 @@ class vampire: public character{
             }
         }
 
-        //vampire's diagonal movement (up-rigth , up-left , down-right , down-left)
         void DiagonalMovement(int movement,Grid *grid){
             switch(movement){
                 case 5: //move UP-RIGHT
@@ -409,32 +389,13 @@ class vampire: public character{
             }
         }
 
-        //function that controls the vampire's movement
-        //if the randomly picked movement is 1-4 then the vampire does a normal movement 
-        //if the randomly picked movement is 5-8 then the vampire does a diagonal movement 
         void VampireMovement(Grid *gptr){
             int mov = Pick_Random_Movement();
             if(mov <= 4) NormalMovement(mov,gptr);
             else DiagonalMovement(mov,gptr);
         }
 
-        void CheckSourroundings(Grid *gptr, char *AdjType, int AdjPos[][2]){
-            for(int i=0; i<4; i++){
-                AdjType[i] = gptr->AccessGridPosition(AdjPos[i][0], AdjPos[i][1]);
-            }
-        }
-
-
-        void Heal(int x, int y){
-<<<<<<< HEAD
-            
-=======
-            vector<vampire *> TeammateVector = ent->GetVampires();
->>>>>>> a2382c9ceb898c2b818c418f8e0b1572afbb14d5
-
-        }
-
-        void Attack(int x, int y){
+        void Attack(){
         //*********YOUT CODE HERE**********
             return;          
         }
@@ -443,49 +404,37 @@ class vampire: public character{
         //*********YOUT CODE HERE**********
             return;        
         }
-
         
 
 };
 
-//the werewolf class
 class werewolf: public character{
     private:
         int health;
         int power;
         int defense;
-        int potions;
         int id;
         Position *pos;        
     public:
-        werewolf(){ //constructor 
+        werewolf(){
             this->pos = new Position();
             this->id = -1;
             this->health = MAX_HEALTH;
             srand(time(NULL));
             this->power = rand()%MAX_POWER;
             this->defense = rand()%MAX_DEFENSE;
-            this->potions = rand()%MAX_POTIONS;
             this->SetSpecies(WEREWOLF);  
         }   
 
-        ~werewolf(){ } //destructor 
-
-        //get werewolf's health,power,defense
         int GetHealthState(){ return this->health; }
         int GetPower(){ return this->power; }
-        int GetDefense(){ return this->defense; }     
-        int GetPotions(){ return this->potions; } 
+        int GetDefense(){ return this->defense; }      
 
-        //update the werewolf's position after each movement 
         void UpdatePosition(int x,int y){ this->pos->SetNewPosition(x,y); }
-        void UpdateHealthState(int h){ this->health = h; }
 
-        //get werewolf's position in the grid 
         Position *GetPosition(){ return this->pos; }
 
-        //this function places the werewolf in a random position in the grid(loop while a random position is empty)
-        void StartingPoint(Grid *grid){  
+        void StartingPoint(Grid *grid){ //move this in the charachter class  
             srand(time(NULL));
             int randX,randY;
             do{
@@ -496,40 +445,39 @@ class werewolf: public character{
             UpdatePosition(randX,randY);  
         }
 
-        bool isInBoundary(Grid *grid){
+        bool isInBoundry(Grid *grid){
             int x = pos->GetPosition()->x;
             int y = pos->GetPosition()->y;
             if(x == 0 || y == 0 || x == grid->getX()-1 || y == grid->getY()-1) return true;
             return false;
         }       
 
-
         bool isLegalMovement(char mov,Grid *grid){
             bool flag = true;
             switch(mov){
                 case 1: //UP
-                    if(isInBoundary(grid) && pos->GetPosition()->x == 0 ){
+                    if(isInBoundry(grid) && pos->GetPosition()->x == 0 ){
                         flag = false;
                         break;
                     }
                     if(!grid->CheckPlace(pos->GetPosition()->x-1,pos->GetPosition()->y)) flag = false;                    
                     break;
                 case 2: //DOWN
-                    if(isInBoundary(grid) && pos->GetPosition()->x == grid->getX()-1){
+                    if(isInBoundry(grid) && pos->GetPosition()->x == grid->getX()-1){
                         flag = false;
                         break;
                     }
                     if(!grid->CheckPlace(pos->GetPosition()->x+1,pos->GetPosition()->y)) flag = false;                
                     break;
                 case 3: //RIGHT
-                     if(isInBoundary(grid) && pos->GetPosition()->y == grid->getY()-1){
+                     if(isInBoundry(grid) && pos->GetPosition()->y == grid->getY()-1){
                         flag = false;
                         break;
                     }
                     if(!grid->CheckPlace(pos->GetPosition()->x,pos->GetPosition()->y+1)) flag = false;               
                     break;
                 case 4: //LEFT
-                    if(isInBoundary(grid) && pos->GetPosition()->y == 0){
+                    if(isInBoundry(grid) && pos->GetPosition()->y == 0){
                         flag = false;
                         break;
                     }
@@ -542,7 +490,6 @@ class werewolf: public character{
 
 
         int Pick_Random_Movement(){ 
-        //this function picks a random movement
             //srand(time(NULL));
             return rand() % 4;
         }        
@@ -591,134 +538,9 @@ class werewolf: public character{
             return;        
         }
 
-        void Heal(){
-
-        }
-
 
 };
 
-//this class will store all the vampires and the werewolves of the game 
-class Entities{
-    private:
-        int VampCount;
-        int WolfCount;
-        vector<vampire *> VampVector;
-        vector<werewolf *> WolfVector;
-
-    public:
-        Entities(){
-            this->VampCount = 0;
-            this->WolfCount = 0;
-        }
-        void CreateEntities(Grid *grid){
-            vampire *vptr = NULL;
-            werewolf *wptr = NULL;
-            for(int i=0;i<grid->TotalEntitiesNum();i++){
-                vptr = new vampire();
-                vptr->StartingPoint(grid);
-                wptr = new werewolf();
-                wptr->StartingPoint(grid);
-                VampVector.push_back(vptr);
-                WolfVector.push_back(wptr);
-            }
-        }
-        //also create a destructor
-        // void ~DestroyEntities(){}
-
-        void UpdateCount(){
-            this->WolfCount = this->WolfVector.size();
-            this->VampCount = this->VampVector.size();
-        }
-
-        int GetVampCount(){ return this->VampCount; }
-        int GetWolfCount(){ return this->WolfCount; }
-
-        vector<vampire *> GetVampires(){ return this->VampVector; }
-        vector<werewolf *> GetWerewolves(){ return this->WolfVector; }
-
-        void EntitiesMovement(Grid *grid){
-            vector<vampire *>::iterator viter;
-            vector<werewolf *>::iterator witer;
-            for(viter = this->VampVector.begin(); viter != this->VampVector.end(); ++viter){
-                (*viter)->VampireMovement(grid);
-            }
-            for(witer = this->WolfVector.begin(); witer != this->WolfVector.end(); ++witer){
-                (*witer)->WerewolfMovement(grid);
-            }            
-        }
-
-        void EntitiesAction(Grid *grid){
-            vector<vampire *>::iterator viter;
-            vector<werewolf *>::iterator witer;
-
-            //for every vampire currently in the game
-            for(viter = this->VampVector.begin(); viter != this->VampVector.end(); ++viter){
-                Position * pos = (*viter)->GetPosition();
-                int curX = pos->GetPosition()->x;
-                int curY = pos->GetPosition()->y;
-                int curHealth = (*viter)->GetHealthState();
-                int curPotions = (*viter)->GetPotions();
-
-                char *AdjType = new char[4]; // array that stores the type of the entities in all adjacent positions to the vampire's current position
-                int AdjPos[4][2]; // array that stores the coordinates of all adjacent positions to the vampire's current position
-                
-                // Adjacent Position Initialization
-                //Up
-                AdjPos[0][0] = curX-1;
-                AdjPos[0][1] = curY;
-                //Down
-                AdjPos[1][0] = curX+1;
-                AdjPos[1][1] = curY;
-                //Left
-                AdjPos[2][0] = curX;
-                AdjPos[2][1] = curY-1;
-                //Right 
-                AdjPos[3][0] = curX;
-                AdjPos[3][1] = curY+1;
-
-
-                (*viter)->CheckSourroundings(grid, AdjType, AdjPos);
-
-                // for(int i=0; i<4; i++){
-                //     if(AdjType[i] == VAMPIRE){
-                //         (*viter)->Heal(curPotions,4);
-                //     }
-                //     else if(AdjType[i] == WEREWOLF){
-                //         if
-
-
-
-                //     }
-
-
-
-                // }
-
-
-
-
-
-
-
-
-
-
-            }
-
-
-            //for every werewolf
-            for(witer = this->WolfVector.begin(); witer != this->WolfVector.end(); ++witer){
-                // (*witer)->CheckSourroundings(grid);
-            }            
-
-
-
-        }
-        
-        
-        
-};
 
 
 class avatar: public character{
@@ -741,8 +563,6 @@ class avatar: public character{
         Position *GetPosition(){ return this->pos; }
 
         void UpdatePosition(int x,int y){ this->pos->SetNewPosition(x,y);}
-        void IncreasePotions(){ this->Potions++; }
-        void DecreasePotions(){ this->Potions--; }
 
         void StartingPoint(Grid *grid){    //maybe put this in the character class as a virtual function and add the players position as a memeber of the class and all teh position related functions at the character class
             srand(time(NULL));
@@ -755,7 +575,10 @@ class avatar: public character{
             UpdatePosition(randX,randY);
         }
 
-        void Heal_Team(Entities *ent, Grid *grid);
+        void Heal_Team(){ 
+            cout << "Healing Teamates!" << endl;
+            return;         
+        }
 
         char PlayerInput(){   
             char Inp;
@@ -768,7 +591,7 @@ class avatar: public character{
         int GetPotions(){ return this->Potions; }
         char GetTeam(){ return this->Team; }
 
-        bool isInBoundary(int x,int y,Grid *gptr){
+        bool isInBoundry(int x,int y,Grid *gptr){
             if(x == 0 || y == 0 || x == gptr->getX()-1 || y == gptr->getY()-1) return true; //have this at the character class
             return false;
         }
@@ -780,7 +603,7 @@ class avatar: public character{
                     if(this->pos->GetPosition()->x != 0){
                         if(grid->isPotion(this->pos->GetPosition()->x-1,this->pos->GetPosition()->y)) break;
                     }                
-                    if(isInBoundary(this->pos->GetPosition()->x,this->pos->GetPosition()->y,grid) && this->pos->GetPosition()->x == 0 ){
+                    if(isInBoundry(this->pos->GetPosition()->x,this->pos->GetPosition()->y,grid) && this->pos->GetPosition()->x == 0 ){
                         flag = false;
                         break;
                     }
@@ -790,7 +613,7 @@ class avatar: public character{
                     if(this->pos->GetPosition()->x != grid->getX()-1){
                         if(grid->isPotion(this->pos->GetPosition()->x+1,this->pos->GetPosition()->y)) break;
                     }                 
-                    if(isInBoundary(this->pos->GetPosition()->x,this->pos->GetPosition()->y,grid) && this->pos->GetPosition()->x == grid->getX()-1){
+                    if(isInBoundry(this->pos->GetPosition()->x,this->pos->GetPosition()->y,grid) && this->pos->GetPosition()->x == grid->getX()-1){
                         flag = false;
                         break;
                     }
@@ -800,7 +623,7 @@ class avatar: public character{
                     if(this->pos->GetPosition()->y != grid->getY()-1){
                         if(grid->isPotion(this->pos->GetPosition()->x,this->pos->GetPosition()->y+1)) break;
                     }                 
-                    if(isInBoundary(this->pos->GetPosition()->x,this->pos->GetPosition()->y,grid) && this->pos->GetPosition()->y == grid->getY()-1){ 
+                    if(isInBoundry(this->pos->GetPosition()->x,this->pos->GetPosition()->y,grid) && this->pos->GetPosition()->y == grid->getY()-1){ 
                         flag = false;
                         break;
                     }
@@ -810,7 +633,7 @@ class avatar: public character{
                     if(this->pos->GetPosition()->y != 0){
                         if(grid->isPotion(this->pos->GetPosition()->x,this->pos->GetPosition()->y-1)) break;
                     }                 
-                    if(isInBoundary(this->pos->GetPosition()->x,this->pos->GetPosition()->y,grid) && this->pos->GetPosition()->y == 0) {
+                    if(isInBoundry(this->pos->GetPosition()->x,this->pos->GetPosition()->y,grid) && this->pos->GetPosition()->y == 0) {
                         flag = false;
                         break;
                     }
@@ -862,7 +685,6 @@ class avatar: public character{
 
 };
 
-void avatar::Heal_Team(Entities *ent,Grid *grid){
 
 
 //this class will store all the vampires and the werewolves of the game 
@@ -910,44 +732,44 @@ class Entities{
                 (*witer)->WerewolfMovement(grid);
             }            
         }
-  
+        
 };
 
-//this class displays the game's statistics after the player pauses the game
+
 class Statistics{
     private:
         int VampiresNum;  //number of active vampires 
         int WerewolvesNum; //number of active werewolves
         int PotionsNum; //number of potions that the player has 
     public:
-        Statistics(){ //construstor 
+        Statistics(){
             this->VampiresNum=0;
             this->WerewolvesNum=0;
             this->PotionsNum=0;
         }
-        ~Statistics(){ } //destrustor 
-        
         void CountVampires(Entities *en){
             en->UpdateCount();
             this->VampiresNum = en->GetVampCount();
         }
-
         void CountWerewolves(Entities *en){
             en->UpdateCount();
             this->WerewolvesNum = en->GetWolfCount();
         } 
-
+        void Refresh(){
+            this->VampiresNum = 0;
+            this->WerewolvesNum = 0;
+            this->WerewolvesNum = 0;            
+        }
         void CountPotions(int potions){ this->PotionsNum = potions; }
         int getVampNum(){ return this->VampiresNum; }  
         int getWereNum(){ return this->WerewolvesNum; }
         int getPotionsNum(){ return this->PotionsNum; } 
-        
-        //display the game's statistics
         void ShowStats(){
             system("stty cooked");
             cout<<"The number of active vampires is : "<<this->getVampNum()<<endl;
             cout<<"The number of active werewolves is : "<<this->getWereNum()<<endl;
             cout<<"The number of potions the player has is : "<<this->getPotionsNum()<<endl;
+            Refresh();
             return;
         }      
 
@@ -967,7 +789,7 @@ Grid CreateWorld(int x,int y){
     return grd1;
 }
 
-//the game class that controls the actual game
+
 class Game{
     private:
         bool flag; //flag that handles the gameplay loop 
@@ -979,7 +801,6 @@ class Game{
         void GamePlay(Grid *gptr,avatar *player,Entities * ent);
 };
 
-//this function allows the game to start only when the player presses 'S'
 void Game::Start(){
     cout << "To start the game press S..."<<endl;
     char in;
@@ -990,12 +811,10 @@ void Game::Start(){
     }    
 }
 
-//this function allows the game to resume only when the player presses 'R'
 void Game::Resume(avatar *player){
     while(player->PlayerInput()!= 'R') cout << "Need to press 'R' to resume the game!"<<endl; 
 }
 
-//when the player presses 'P' the game is paused and the game's statistics are in display
 void Game::Pause(Entities *en,Statistics *stats,avatar * player){
     char input;
     stats->CountVampires(en);
@@ -1004,8 +823,7 @@ void Game::Pause(Entities *en,Statistics *stats,avatar * player){
     stats->ShowStats();    
 }
 
-//this function controls the actual gameplay 
-//it has a while loop that loops until the player presses 'Q' 
+//pass a vector pointer for each entity in this function
 void Game::GamePlay(Grid *gptr,avatar *player,Entities * ent){
 
     this->flag=true;  
@@ -1037,17 +855,15 @@ void Game::GamePlay(Grid *gptr,avatar *player,Entities * ent){
         }
         else if(input == 'H'){
         //if the player's input is 'H' then heal the whole team 
-            player->Heal_Team(ent, gptr);
+            player->Heal_Team();
         }
         else{
             //first the player moves 
             player->PlayerMovement(input,gptr);
             //after the player's movement the other entities move 
             ent->EntitiesMovement(gptr);
-            //ent->EntitiesAction(gptr);
             //increase the cycle count after each frame
             gptr->IncreaseCycleCount();
-            //render 
             gptr->ShowGrid();
             //usleep(100000); 
             usleep(50000);
@@ -1065,7 +881,7 @@ int main(int argc,char *argv[]){
 
     //wrong input handling
     if(argc < 2){
-        cout<<"Wrong Input!!"<<endl<<"Exepcted input is : ./new_game [integer] [integer]"<<endl;
+        cout<<"Wrong Input!!"<<endl<<"Exepcted input is : ./game2 [integer] [integer]"<<endl;
         return -1; 
     }
     //create the world 
