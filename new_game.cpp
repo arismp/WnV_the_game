@@ -965,7 +965,7 @@ int main(int argc,char *argv[]){
 
     //wrong input handling
     if(argc < 2){
-        cout<<"Wrong Input!!"<<endl<<"Exepcted input is : ./game2 [integer] [integer]"<<endl;
+        cout<<"Wrong Input!!"<<endl<<"Exepcted input is : ./new_game [integer] [integer]"<<endl;
         return -1; 
     }
     //create the world 
