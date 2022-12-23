@@ -155,7 +155,7 @@ class Grid{
                     randX=rand()%this->x;
                     randY=rand()%this->y;
                 }while(CheckPlace(randX,randY)==false); 
-                this->grid[randX][randY]='W';    
+                this->grid[randX][randY]='=';    
             }
         }
 
