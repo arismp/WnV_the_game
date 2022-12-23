@@ -207,6 +207,7 @@ class character{
         char GetSpecies(){ return this->Species; }      
 };
 
+class Entities;
  
 class vampire: public character{
     private:
@@ -402,42 +403,15 @@ class vampire: public character{
             else DiagonalMovement(mov,gptr);
         }
 
-        void CheckSourroundings(Grid *gptr){
-            
-            int curX = pos->GetPosition()->x;
-            int curY = pos->GetPosition()->y;
-            char AdjType[4];     // array that stores the type of the entities in all adjacent positions to the vampire's current position
-            int AdjPos[4][2];   // array that stores the coordinates of all adjacent positions to the vampire's current position
-
-            // Adjacent Position Initialization
-            AdjPos[0][1] = curX-1;
-            AdjPos[0][2] = curY;
-
-
-            //////CHECK IF OUT OF BOUNDS 
-            //check UP
-            AdjType[0] = gptr->AccessGridPosition(AdjPos[0][0], AdjPos[0][1]);
-            if(AdjType[0] == WEREWOLF){
-                Heal(AdjPos[0][0], AdjPos[0][1]);
+        void CheckSourroundings(Grid *gptr, char *AdjType, int AdjPos[][2]){
+            for(int i=0; i<4; i++){
+                AdjType[i] = gptr->AccessGridPosition(AdjPos[i][0], AdjPos[i][1]);
             }
-            else if(AdjType[0] == VAMPIRE){
-
-            }
-
-            //check DOWN
-            AdjType[1] = gptr->AccessGridPosition(curX+1, curY);
-
-            //check LEFT
-            AdjType[2] = gptr->AccessGridPosition(curX, curY-1);
-
-            //check RIGHT
-            AdjType[3] = gptr->AccessGridPosition(curX, curY+1);
-            
- 
         }
 
+
         void Heal(int x, int y){
-            vector<vampire *> TeammateVector = ent->GetVampires()
+            
 
         }
 
@@ -622,6 +596,7 @@ class Entities{
             }
         }
         //also create a destructor
+        // void ~DestroyEntities(){}
 
         void UpdateCount(){
             this->WolfCount = this->WolfVector.size();
@@ -644,6 +619,76 @@ class Entities{
                 (*witer)->WerewolfMovement(grid);
             }            
         }
+
+        void EntitiesAction(Grid *grid){
+            vector<vampire *>::iterator viter;
+            vector<werewolf *>::iterator witer;
+
+            //for every vampire currently in the game
+            for(viter = this->VampVector.begin(); viter != this->VampVector.end(); ++viter){
+                Position * pos = (*viter)->GetPosition();
+                int curX = pos->GetPosition()->x;
+                int curY = pos->GetPosition()->y;
+                int curHealth = (*viter)->GetHealthState();
+                int curPotions = (*viter)->GetPotions();
+
+                char *AdjType = new char[4]; // array that stores the type of the entities in all adjacent positions to the vampire's current position
+                int AdjPos[4][2]; // array that stores the coordinates of all adjacent positions to the vampire's current position
+                
+                // Adjacent Position Initialization
+                //Up
+                AdjPos[0][0] = curX-1;
+                AdjPos[0][1] = curY;
+                //Down
+                AdjPos[1][0] = curX+1;
+                AdjPos[1][1] = curY;
+                //Left
+                AdjPos[2][0] = curX;
+                AdjPos[2][1] = curY-1;
+                //Right 
+                AdjPos[3][0] = curX;
+                AdjPos[3][1] = curY+1;
+
+
+                (*viter)->CheckSourroundings(grid, AdjType, AdjPos);
+
+                // for(int i=0; i<4; i++){
+                //     if(AdjType[i] == VAMPIRE){
+                //         (*viter)->Heal(curPotions,4);
+                //     }
+                //     else if(AdjType[i] == WEREWOLF){
+                //         if
+
+
+
+                //     }
+
+
+
+                // }
+
+
+
+
+
+
+
+
+
+
+            }
+
+
+            //for every werewolf
+            for(witer = this->WolfVector.begin(); witer != this->WolfVector.end(); ++witer){
+                // (*witer)->CheckSourroundings(grid);
+            }            
+
+
+
+        }
+        
+        
         
 };
 
@@ -946,6 +991,7 @@ void Game::GamePlay(Grid *gptr,avatar *player,Entities * ent){
             player->PlayerMovement(input,gptr);
             //after the player's movement the other entities move 
             ent->EntitiesMovement(gptr);
+            //ent->EntitiesAction(gptr);
             //increase the cycle count after each frame
             gptr->IncreaseCycleCount();
             gptr->ShowGrid();
