@@ -688,18 +688,22 @@ void avatar::Heal_Team(Entities *ent,Grid *grid){
 
 
 //this class will store all the vampires and the werewolves of the game 
+//it also handles the movement and the actions(attack etc.) of each entity (werewolves/vampires)
 class Entities{
     private:
-        int VampCount;
-        int WolfCount;
-        vector<vampire *> VampVector;
-        vector<werewolf *> WolfVector;
+        int VampCount; //the number of active vampires
+        int WolfCount; //the number of active werewolves
+        vector<vampire *> VampVector; //this is a vector that stores a pointer to every vmapire object
+        vector<werewolf *> WolfVector; //this is a vector that stores a pointer to every werewolf object
 
     public:
-        Entities(){
-            this->VampCount = 0;
+        Entities(){ //constructor 
+            this->VampCount = 0; 
             this->WolfCount = 0;
         }
+
+        //this function creates all the werewolves and the vampires and adds them into the vectors
+        //it also places them randomly in the grid 
         void CreateEntities(Grid *grid){
             vampire *vptr = NULL;
             werewolf *wptr = NULL;
@@ -715,14 +719,17 @@ class Entities{
 
         //also create a destructor
 
+        //update the counters
         void UpdateCount(){
             this->WolfCount = this->WolfVector.size();
             this->VampCount = this->VampVector.size();
         }
 
+        //get the counters
         int GetVampCount(){ return this->VampCount; }
         int GetWolfCount(){ return this->WolfCount; }
 
+<<<<<<< HEAD
         vector<vampire *> GetVampires(){ return this->VampVector; }
         vector<werewolf *> GetWerewolves(){ return this->WolfVector; }
 
@@ -747,15 +754,17 @@ class Entities{
             return NULL;
         }
 
+=======
+        //this function handles the movement of each entity (vampire/werewolf) in the game 
+        //it iterates through the vectors and for each object it makes a movement 
+>>>>>>> d7a5b40e6ce65389ed375f4e3ef25211e281b9ab
         void EntitiesMovement(Grid *grid){
             vector<vampire *>::iterator viter;
             vector<werewolf *>::iterator witer;
             for(viter = this->VampVector.begin(); viter != this->VampVector.end(); ++viter){
-                //srand(time(NULL));
                 (*viter)->VampireMovement(grid);
             }
             for(witer = this->WolfVector.begin(); witer != this->WolfVector.end(); ++witer){
-                //srand(time(NULL));
                 (*witer)->Movement(grid);
             }            
         }
