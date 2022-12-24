@@ -18,6 +18,7 @@ const char LEFT = 68; //left movement
 const int MAX_POWER = 3;  //maximum power is 3
 const int MAX_HEALTH = 3; //maximum health is 3
 const int MAX_DEFENSE = 3; //maximum defense is 3
+const int MAX_POTIONS = 2; //maximum number of potions is 2 
 
 const char WEREWOLF = 'w'; 
 const char VAMPIRE = 'v';
@@ -86,6 +87,8 @@ class Grid{
             }
         }
         ~Grid(){ delete[] this->grid; } //delete the grid 
+
+        char GetTime(){ return this->Day_n_Night_Cycle; }
 
         void ShowDayAndNightCycle(){ // show when is day and when is night 
             cout << endl;
@@ -251,6 +254,7 @@ class Creature: public character{
         int health;
         int power;
         int defense;
+        int potions;
        
     public:
         Creature(){ //constructor
@@ -263,10 +267,14 @@ class Creature: public character{
         //set the new entity's health status 
         void SetHealth(int h){ this->health =h; }
 
-        //get the entity's health,power,defense status
+        //get the entity's health,power,defense and potions status
         int GetHealthState(){ return this->health; }
         int GetPower(){ return this->power; }
         int GetDefense(){ return this->defense; }             
+        int GetPotions(){ return this->potions; }
+
+        //decrease the entity's potions by 1
+        void DecreasePotions(){ this->potions--; }
 
         //this function check if a movement is legal (returns true if legal and false if not)
         //it checks whether an entity is in the grid's boundary so it does't go out of bounds
@@ -353,6 +361,13 @@ class Creature: public character{
         }
 
 
+        //checks the entity's sourrounding positions 
+        void CheckSourroundings(Grid *gptr, char *AdjType, int AdjPos[][2]){
+            for(int i=0; i<4; i++){
+                AdjType[i] = gptr->AccessGridPosition(AdjPos[i][0], AdjPos[i][1]);
+            }
+        }
+
 };
 
 //this is the werewolf class that inherits the public part of the Creature class 
@@ -360,6 +375,35 @@ class werewolf: public Creature{
     public:
         werewolf(){ this->SetSpecies(WEREWOLF); } //constructor 
         ~werewolf(){ } //destructor 
+
+        void Heal(werewolf *w){
+            int health = w->GetHealthState();
+            if(health < MAX_HEALTH){
+                if(rand()%2 == 0){
+                    this->DecreasePotions();
+                    w->SetHealth(health+1);
+                }
+            }
+        }
+
+        void Attack(vampire *v){
+            int vdefense = v->GetDefense();
+            int wattack = this->GetPower();
+            if(wattack > vdefense){
+                int damage = abs(wattack - vdefense);
+                v->SetHealth(v->GetHealthState() - damage);
+            }
+        }
+
+        void Dodge(char *AdjType, int AdjPos[][2]){
+          for(int i=0; i<4; ++i){
+            if(AdjType[i] == '.'){
+                this->UpdatePosition(AdjPos[i][0],AdjPos[i][1]);
+                break;
+            }
+          }
+        }
+
 };
 
 //this is the vampire class that inherits the public part of the Creature class
@@ -454,11 +498,40 @@ class vampire: public Creature{
             int mov = Pick_Random_Vamp_Movement();
             if(mov <= 4) this->Movement(gptr);
             else DiagonalMovement(mov,gptr);
-        }    
+        } 
+
+        void Heal(vampire *v){
+            int health = v->GetHealthState();
+            if(health < MAX_HEALTH){
+                if(rand()%2 == 0){
+                    this->DecreasePotions();
+                    v->SetHealth(health+1);
+                }
+            }
+        }
+
+        void Attack(werewolf *w){
+            int wdefense = w->GetDefense();
+            int vattack = this->GetPower();
+            if(vattack > wdefense){
+                int damage = abs(vattack - wdefense);
+                w->SetHealth(w->GetHealthState() - damage);
+            }
+        }
+
+        void Dodge(char *AdjType, int AdjPos[][2]){
+          for(int i=0; i<4; ++i){
+            if(AdjType[i] == '.'){
+                this->UpdatePosition(AdjPos[i][0],AdjPos[i][1]);
+                break;
+            }
+          }
+        }
+
 
 };
 
-
+class Entities;
 //this is the avatar class that inherits everything from the character class
 class avatar: public character{
     private:
@@ -475,11 +548,12 @@ class avatar: public character{
         }
         ~avatar(){} //destructor 
 
+        //Increase/Decrease the avatar's potions by 1
+        void IncreasePotions(){ this->Potions++; }
+        void DecreasePotions(){ this->Potions--; }
+
         //this function heals all the teammates
-        void Heal_Team(){ 
-            cout << "Healing Teamates!" << endl;
-            return;         
-        }
+        void Heal_Team(Entities *ent, Grid *grid);
 
         //this function gets the player input using getchar()
         char PlayerInput(){   
@@ -584,6 +658,34 @@ class avatar: public character{
 };
 
 
+void avatar::Heal_Team(Entities *ent,Grid *grid){
+    
+    char Team = this->GetTeam();
+    char Time = grid->GetTime();
+    int Potions = this->GetPotions();
+
+    if(Potions > 0){
+        if (Team == 'V' && Time == 'N'){
+            vector<vampire *> TeammateVector;
+            vector<vampire *>::iterator viter;
+            TeammateVector = ent->GetVampires();
+            for(viter = TeammateVector.begin(); viter != TeammateVector.end(); ++viter){
+                (*viter)->SetHealth(MAX_HEALTH);
+            }
+        }
+        else if(Team == 'W' && Time == 'D'){
+            vector<werewolf *> TeammateVector;
+            vector<werewolf *>::iterator witer;
+            TeammateVector = ent->GetWerewolves();
+            for(witer = TeammateVector.begin(); witer != TeammateVector.end(); ++witer){
+                (*witer)->SetHealth(MAX_HEALTH);
+            }
+        }
+        this->DecreasePotions();
+    }
+    
+}
+
 
 //this class will store all the vampires and the werewolves of the game 
 class Entities{
@@ -621,6 +723,30 @@ class Entities{
         int GetVampCount(){ return this->VampCount; }
         int GetWolfCount(){ return this->WolfCount; }
 
+        vector<vampire *> GetVampires(){ return this->VampVector; }
+        vector<werewolf *> GetWerewolves(){ return this->WolfVector; }
+
+        vampire *GetVamp(int x, int y){
+            vector<vampire *>::iterator viter;
+            for(viter = this->VampVector.begin(); viter != this->VampVector.end(); ++viter){
+                Position *vpos = (*viter)->GetEntityPosition();
+                if((vpos->GetPosition()->x == x) && (vpos->GetPosition()->y == y)){
+                    return *viter;
+                }
+            }
+            return NULL;
+        }
+        werewolf *GetWolf(int x, int y){
+            vector<werewolf *>::iterator witer;
+            for(witer = this->WolfVector.begin(); witer != this->WolfVector.end(); ++witer){
+                Position *wpos = (*witer)->GetEntityPosition();
+                if((wpos->GetPosition()->x == x) && (wpos->GetPosition()->y == y)){
+                    return *witer;
+                }
+            }
+            return NULL;
+        }
+
         void EntitiesMovement(Grid *grid){
             vector<vampire *>::iterator viter;
             vector<werewolf *>::iterator witer;
@@ -632,6 +758,87 @@ class Entities{
                 //srand(time(NULL));
                 (*witer)->Movement(grid);
             }            
+        }
+        
+        void EntitiesAction(Grid *grid){
+            vector<vampire *>::iterator viter;
+            vector<werewolf *>::iterator witer;
+
+            //for every vampire currently in the game
+            for(viter = this->VampVector.begin(); viter != this->VampVector.end(); ++viter){
+                Position * pos = (*viter)->GetEntityPosition();
+                int curX = pos->GetPosition()->x;
+                int curY = pos->GetPosition()->y;
+                int curHealth = (*viter)->GetHealthState();
+                int curPotions = (*viter)->GetPotions();
+
+                char *AdjType = new char[4]; // array that stores the type of the entities in all adjacent positions to the vampire's current position
+                int AdjPos[4][2]; // array that stores the coordinates of all adjacent positions to the vampire's current position
+                
+                // Adjacent Position Initialization
+                //Up
+                AdjPos[0][0] = curX-1;
+                AdjPos[0][1] = curY;
+                //Down
+                AdjPos[1][0] = curX+1;
+                AdjPos[1][1] = curY;
+                //Left
+                AdjPos[2][0] = curX;
+                AdjPos[2][1] = curY-1;
+                //Right 
+                AdjPos[3][0] = curX;
+                AdjPos[3][1] = curY+1;
+
+
+                (*viter)->CheckSourroundings(grid, AdjType, AdjPos);
+
+                for(int i=0; i<4; i++){
+                    if(AdjType[i] == VAMPIRE){
+                        // vampire *AdjV = GetVamp(AdjPos[i][0], AdjPos[i][1]);
+                        // int vhealth = AdjV->GetHealthState();
+                        (*viter)->Heal(GetVamp(AdjPos[i][0], AdjPos[i][1]));
+                        // (*viter)->DecreasePotions();
+                    }
+                    else if(AdjType[i] == WEREWOLF){
+                        werewolf *wolf = GetWolf(AdjPos[i][0], AdjPos[i][1]);
+
+
+                        int wp = wolf->GetPower();
+                        int vp = (*viter)->GetPower();
+
+                        if(vp >= wp) 
+                            (*viter)->Attack(wolf); 
+                            if((wolf->GetHealthState()) <= 0){
+                                //find wolf's index in vector
+                                for(int i=0; i<WolfVector.size(); ++i){
+                                    if(WolfVector[i] == wolf)
+                                    break;
+                                }
+                                //vectorpop
+                                // WolfVector.erase(remove(WolfVector.begin(), WolfVector.end(), wolf), WolfVector.end());
+                                WolfVector.erase(WolfVector.begin()+i);
+                                //vector Size? wolf count 
+
+                                grid->UpdateGrid(AdjPos[i][0], AdjPos[i][1],'.');
+
+                            }
+                        else
+                            (*viter)->Dodge(AdjType, AdjPos);
+
+                    }
+                }
+            }
+            //for every werewolf
+            for(witer = this->WolfVector.begin(); witer != this->WolfVector.end(); ++witer){
+                // (*witer)->CheckSourroundings(grid);
+
+
+
+
+            }            
+
+
+
         }
         
 };
@@ -777,7 +984,7 @@ void Game::GamePlay(Grid *gptr,avatar *player,Entities * ent){
         }
         else if(input == 'H'){
         //if the player's input is 'H' then heal the whole team 
-            player->Heal_Team();
+            player->Heal_Team(ent,gptr);
         }
         else{
             //first the player moves 
