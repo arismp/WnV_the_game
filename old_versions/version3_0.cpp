@@ -729,7 +729,6 @@ class Entities{
         int GetVampCount(){ return this->VampCount; }
         int GetWolfCount(){ return this->WolfCount; }
 
-<<<<<<< HEAD
         vector<vampire *> GetVampires(){ return this->VampVector; }
         vector<werewolf *> GetWerewolves(){ return this->WolfVector; }
 
@@ -754,10 +753,6 @@ class Entities{
             return NULL;
         }
 
-=======
-        //this function handles the movement of each entity (vampire/werewolf) in the game 
-        //it iterates through the vectors and for each object it makes a movement 
->>>>>>> d7a5b40e6ce65389ed375f4e3ef25211e281b9ab
         void EntitiesMovement(Grid *grid){
             vector<vampire *>::iterator viter;
             vector<werewolf *>::iterator witer;
