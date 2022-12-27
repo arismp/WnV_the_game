@@ -114,121 +114,149 @@ void Entities::EntitiesAction(Grid *grid){
     std::vector<vampire *>::iterator viter;
     std::vector<werewolf *>::iterator witer;
 
-    //for every vampire currently in the game
-    for(viter = this->VampVector.begin(); viter != this->VampVector.end(); ++viter){
-        Position * pos = (*viter)->GetEntityPosition();
-        int curX = pos->GetPosition()->x;
-        int curY = pos->GetPosition()->y;
-        int curHealth = (*viter)->GetHealthState();
-        int curPotions = (*viter)->GetPotions();
-
-        char *AdjType = new char[4]; // array that stores the type of the entities in all adjacent positions to the vampire's current position
-        int **AdjPos = new int*[4]; // array that stores the coordinates of all adjacent positions to the vampire's current position
-        for(int i=0; i<4; ++i){
-            AdjPos[i] = new int[2];
-        }
-        // Adjacent Positions Initialization
-        //Up
-        AdjPos[0][0] = curX-1;
-        AdjPos[0][1] = curY;
-        //Down
-        AdjPos[1][0] = curX+1;
-        AdjPos[1][1] = curY;
-        //Left
-        AdjPos[2][0] = curX;
-        AdjPos[2][1] = curY-1;
-        //Right 
-        AdjPos[3][0] = curX;
-        AdjPos[3][1] = curY+1;
-
-
-       //check the vampires sourroundings
-        (*viter)->CheckSourroundings(grid, AdjType, AdjPos);
-        for(int i=0; i<4; i++){
-            if(AdjType[i] == VAMPIRE){
-                (*viter)->Heal(GetVamp(AdjPos[i][0], AdjPos[i][1]));
-            }
-            else if(AdjType[i] == WEREWOLF){
-                werewolf *wolf = GetWolf(AdjPos[i][0], AdjPos[i][1]);
-                int wp = wolf->GetPower();
-                int vp = (*viter)->GetPower();
-                //if the vampire is at least as strong as the werewolf it chooses to attack
-                if(vp >= wp){ 
-                    (*viter)->Attack(wolf); 
-                    //if the werewolf has been defeated, remove it from the game
-                    if((wolf->GetHealthState()) <= 0){
-                        //find the werewolf's index in entities vector and erase it
-                        for(int i=0; i<WolfVector.size(); ++i){
-                            if(WolfVector[i] == wolf)
-                            break;
+    char *AdjType = new char[4]; // array that stores the type of the entities in all adjacent positions to the vampire's current position
+    int **AdjPos = new int*[4]; // array that stores the coordinates of all adjacent positions to the vampire's current position
+    for(int i=0; i<4; ++i){
+        AdjPos[i] = new int[2];
+    }
+    
+    int randomteamturn = (rand()%2)+1; //random turn to decide which team plays first each time
+    if(randomteamturn == 1){ //if =1 vapmires play first 
+        
+        //for every vampire currently in the game
+        for(viter = this->VampVector.begin(); viter != this->VampVector.end(); ++viter){
+        //check the vampire's sourroundings
+            (*viter)->CheckSourroundings(grid, AdjType, AdjPos);
+            for(int i=0; i<4; i++){
+                if(AdjType[i] == VAMPIRE){
+                    (*viter)->Heal(GetVamp(AdjPos[i][0], AdjPos[i][1]));
+                }
+                else if(AdjType[i] == WEREWOLF){
+                    werewolf *wolf = GetWolf(AdjPos[i][0], AdjPos[i][1]);
+                    int wp = wolf->GetPower();
+                    int vp = (*viter)->GetPower();
+                    //if the vampire is at least as strong as the werewolf it chooses to attack
+                    if(vp >= wp){ 
+                        (*viter)->Attack(wolf); 
+                        //if the werewolf has been defeated, remove it from the game
+                        if((wolf->GetHealthState()) <= 0){
+                            //find the werewolf's index in entities vector and erase it
+                            for(int i=0; i<WolfVector.size(); ++i){
+                                if(WolfVector[i] == wolf)
+                                break;
+                            }
+                            WolfVector.erase(remove(WolfVector.begin(), WolfVector.end(), wolf), WolfVector.end());
+                            grid->UpdateGrid(AdjPos[i][0], AdjPos[i][1],'.');
                         }
-                        WolfVector.erase(remove(WolfVector.begin(), WolfVector.end(), wolf), WolfVector.end());
-                        grid->UpdateGrid(AdjPos[i][0], AdjPos[i][1],'.');
+                    }
+                    //if not, it tries to get away 
+                    else{
+                        (*viter)->Dodge(AdjType, AdjPos);
                     }
                 }
-                //if not, it tries to get away 
-                else{
-                    (*viter)->Dodge(AdjType, AdjPos);
+            }
+        }
+        // for every werewolf
+        for(witer = this->WolfVector.begin(); witer != this->WolfVector.end(); ++witer){
+            //check the werewolf's sourroundings
+            (*witer)->CheckSourroundings(grid, AdjType, AdjPos);
+            for(int i=0; i<4; i++){
+                if(AdjType[i] == WEREWOLF){
+                    (*witer)->Heal(GetWolf(AdjPos[i][0], AdjPos[i][1]));
+                }
+                else if(AdjType[i] == VAMPIRE){
+                    vampire *vamp = GetVamp(AdjPos[i][0], AdjPos[i][1]);
+                    int vp = vamp->GetPower();
+                    int wp = (*witer)->GetPower();
+                    //if the werewolf is at least as strong as the vampire it chooses to attack
+                    if(wp >= vp){ 
+                        (*witer)->Attack(vamp); 
+                        //if the vampire has been defeated, remove it from the game
+                        if((vamp->GetHealthState()) <= 0){
+                            //find the vampire's index in the entities vector and erase it
+                            for(int i=0; i<VampVector.size(); ++i){
+                                if(VampVector[i] == vamp){
+                                    break;
+                                }
+                            }
+                            VampVector.erase(remove(VampVector.begin(), VampVector.end(), vamp), VampVector.end());
+                            grid->UpdateGrid(AdjPos[i][0], AdjPos[i][1],'.');
+                        }
+                    }
+                    //if not, it tries to get away
+                    else{
+                        (*witer)->Dodge(AdjType, AdjPos);
+                    }
                 }
             }
         }
     }
-    // for every werewolf
-    for(witer = this->WolfVector.begin(); witer != this->WolfVector.end(); ++witer){
-
-        Position * pos = (*witer)->GetEntityPosition();
-        int curX = pos->GetPosition()->x;
-        int curY = pos->GetPosition()->y;
-        int curHealth = (*witer)->GetHealthState();
-        int curPotions = (*witer)->GetPotions();
-
-        char *AdjType = new char[4]; // array that stores the type of the entities in all adjacent positions to the vampire's current position
-        int **AdjPos = new int*[4]; // array that stores the coordinates of all adjacent positions to the vampire's current position
-        for(int i=0; i<4; ++i){
-            AdjPos[i] = new int[2];
-        }        
-        // Adjacent Positions Initialization
-        //Up
-        AdjPos[0][0] = curX-1;
-        AdjPos[0][1] = curY;
-        //Down
-        AdjPos[1][0] = curX+1;
-        AdjPos[1][1] = curY;
-        //Left
-        AdjPos[2][0] = curX;
-        AdjPos[2][1] = curY-1;
-        //Right 
-        AdjPos[3][0] = curX;
-        AdjPos[3][1] = curY+1;
-
-        //check the werewolves sourroundings
-        (*witer)->CheckSourroundings(grid, AdjType, AdjPos);
-        for(int i=0; i<4; i++){
-            if(AdjType[i] == WEREWOLF){
-                (*witer)->Heal(GetWolf(AdjPos[i][0], AdjPos[i][1]));
-            }
-            else if(AdjType[i] == VAMPIRE){
-                vampire *vamp = GetVamp(AdjPos[i][0], AdjPos[i][1]);
-                int vp = vamp->GetPower();
-                int wp = (*witer)->GetPower();
-                //if the werewolf is at least as strong as the vampire it chooses to attack
-                if(wp >= vp){ 
-                    (*witer)->Attack(vamp); 
-                    //if the vampire has been defeated, remove it from the game
-                    if((vamp->GetHealthState()) <= 0){
-                        //find the vampire's index in the entities vector and erase it
-                        for(int i=0; i<VampVector.size(); ++i){
-                            if(VampVector[i] == vamp){
+    else{  //werewolves play first
+        for(viter = this->VampVector.begin(); viter != this->VampVector.end(); ++viter){
+            //check the vampire's sourroundings
+            (*viter)->CheckSourroundings(grid, AdjType, AdjPos);
+            for(int i=0; i<4; i++){
+                if(AdjType[i] == VAMPIRE){
+                    (*viter)->Heal(GetVamp(AdjPos[i][0], AdjPos[i][1]));
+                }
+                else if(AdjType[i] == WEREWOLF){
+                    werewolf *wolf = GetWolf(AdjPos[i][0], AdjPos[i][1]);
+                    int wp = wolf->GetPower();
+                    int vp = (*viter)->GetPower();
+                    //if the vampire is at least as strong as the werewolf it chooses to attack
+                    if(vp >= wp){ 
+                        (*viter)->Attack(wolf); 
+                        //if the werewolf has been defeated, remove it from the game
+                        if((wolf->GetHealthState()) <= 0){
+                            //find the werewolf's index in entities vector and erase it
+                            for(int i=0; i<WolfVector.size(); ++i){
+                                if(WolfVector[i] == wolf)
                                 break;
                             }
+                            WolfVector.erase(remove(WolfVector.begin(), WolfVector.end(), wolf), WolfVector.end());
+                            grid->UpdateGrid(AdjPos[i][0], AdjPos[i][1],'.');
                         }
-                        VampVector.erase(remove(VampVector.begin(), VampVector.end(), vamp), VampVector.end());
-                        grid->UpdateGrid(AdjPos[i][0], AdjPos[i][1],'.');
+                    }
+                    //if not, it tries to get away 
+                    else{
+                        (*viter)->Dodge(AdjType, AdjPos);
                     }
                 }
-                //if not, it tries to get away
-                else{
-                    (*witer)->Dodge(AdjType, AdjPos);
+            }
+
+        }
+        // for every werewolf
+        for(witer = this->WolfVector.begin(); witer != this->WolfVector.end(); ++witer){
+
+            //check the werewolf's sourroundings
+            (*witer)->CheckSourroundings(grid, AdjType, AdjPos);
+            for(int i=0; i<4; i++){
+                if(AdjType[i] == WEREWOLF){
+                    (*witer)->Heal(GetWolf(AdjPos[i][0], AdjPos[i][1]));
+                }
+                else if(AdjType[i] == VAMPIRE){
+                    vampire *vamp = GetVamp(AdjPos[i][0], AdjPos[i][1]);
+                    int vp = vamp->GetPower();
+                    int wp = (*witer)->GetPower();
+                    //if the werewolf is at least as strong as the vampire it chooses to attack
+                    if(wp >= vp){ 
+                        (*witer)->Attack(vamp); 
+                        //if the vampire has been defeated, remove it from the game
+                        if((vamp->GetHealthState()) <= 0){
+                            //find the vampire's index in the entities vector and erase it
+                            for(int i=0; i<VampVector.size(); ++i){
+                                if(VampVector[i] == vamp){
+                                    break;
+                                }
+                            }
+                            VampVector.erase(remove(VampVector.begin(), VampVector.end(), vamp), VampVector.end());
+                            grid->UpdateGrid(AdjPos[i][0], AdjPos[i][1],'.');
+                        }
+                    }
+                    //if not, it tries to get away
+                    else{
+                        (*witer)->Dodge(AdjType, AdjPos);
+                    }
                 }
             }
         }
@@ -503,8 +531,9 @@ void vampire::Heal(vampire *v){
 //this function allows vampires to attack werewolves
 void vampire::Attack(werewolf *w){
     int wdefense = w->GetDefense();
+    int wattack = w->GetPower();
     int vattack = this->GetPower();
-    if(vattack > wdefense){
+    if(vattack >= wattack){
         // std::cout << "Vampire attacks!" << std::endl;
         int damage = abs(vattack - wdefense);
         w->SetHealth(w->GetHealthState() - damage);
@@ -541,8 +570,9 @@ void werewolf::Heal(werewolf *w){
 //this function allows werewolves to attack vampires
 void werewolf::Attack(vampire *v){
     int vdefense = v->GetDefense();
+    int vattack = v->GetPower();
     int wattack = this->GetPower();
-    if(wattack > vdefense){
+    if(wattack >= vattack){
         // std::cout << "Werewolf attacks!" << std::endl;
         int damage = abs(wattack - vdefense);
         v->SetHealth(v->GetHealthState() - damage);
@@ -672,6 +702,32 @@ void Creature::Movement(Grid *grid){
 
 //this function checks the entity's sourrounding positions and stores them into the adjacent positions array to be used from the rest of the creature's methods
 void Creature::CheckSourroundings(Grid *gptr, char *AdjType, int **AdjPos){
+    Position * pos = this->GetEntityPosition();
+    int curX = pos->GetPosition()->x;
+    int curY = pos->GetPosition()->y;
+    // int curHealth = (*viter)->GetHealthState();
+    // int curPotions = (*viter)->GetPotions();
+
+    // char *AdjType = new char[4]; // array that stores the type of the entities in all adjacent positions to the vampire's current position
+    // int **AdjPos = new int*[4]; // array that stores the coordinates of all adjacent positions to the vampire's current position
+    // for(int i=0; i<4; ++i){
+    //     AdjPos[i] = new int[2];
+    // }
+    // Adjacent Positions Initialization
+    //Up
+    AdjPos[0][0] = curX-1;
+    AdjPos[0][1] = curY;
+    //Down
+    AdjPos[1][0] = curX+1;
+    AdjPos[1][1] = curY;
+    //Left
+    AdjPos[2][0] = curX;
+    AdjPos[2][1] = curY-1;
+    //Right 
+    AdjPos[3][0] = curX;
+    AdjPos[3][1] = curY+1;
+
+
     int x, y;
     //check all 4 adjacent positions around a creature
     for(int i=0; i<4; i++){
