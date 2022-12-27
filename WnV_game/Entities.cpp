@@ -468,7 +468,7 @@ void vampire::VampireMovement(Grid *gptr){
 //this function allows vampires to heal eachother
 void vampire::Heal(vampire *v){
     int health = v->GetHealthState();
-    if(health < MAX_HEALTH){
+    if(health < MAX_HEALTH && this->GetPotions()>0){
         if(rand()%2 == 0){
             this->DecreasePotions();
             v->SetHealth(health+1);
@@ -506,7 +506,7 @@ werewolf::~werewolf(){ } //destructor
 //this function allowes werewolves to heal each other
 void werewolf::Heal(werewolf *w){
     int health = w->GetHealthState();
-    if(health < MAX_HEALTH){
+    if(health < MAX_HEALTH && this->GetPotions()>0){
         if(rand()%2 == 0){
             this->DecreasePotions();
             w->SetHealth(health+1);
