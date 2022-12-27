@@ -1,3 +1,4 @@
+//this is the implementation of the entities' methods
 #include <cstdlib>
 #include <vector>
 #include <iostream>
@@ -6,9 +7,7 @@
 #include "constants.h"
 #include "Entities.h"
 #include "Grid.h"
-// #include "Game.h"
 
-//this is the implementation of the entities' methods
 Entities::Entities(){ //constructor 
     this->VampCount = 0; 
     this->WolfCount = 0;
@@ -695,14 +694,7 @@ void Creature::CheckSourroundings(Grid *gptr, char *AdjType, int **AdjPos){
     Position * pos = this->GetEntityPosition();
     int curX = pos->GetPosition()->x;
     int curY = pos->GetPosition()->y;
-    // int curHealth = (*viter)->GetHealthState();
-    // int curPotions = (*viter)->GetPotions();
-
-    // char *AdjType = new char[4]; // array that stores the type of the entities in all adjacent positions to the vampire's current position
-    // int **AdjPos = new int*[4]; // array that stores the coordinates of all adjacent positions to the vampire's current position
-    // for(int i=0; i<4; ++i){
-    //     AdjPos[i] = new int[2];
-    // }
+  
     // Adjacent Positions Initialization
     //Up
     AdjPos[0][0] = curX-1;
