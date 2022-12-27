@@ -26,7 +26,7 @@ const char VAMPIRE = 'v';
 
 const char WATER = '=';
 const char TREE = 'T';
-const char EARTH = ' ';
+const char EARTH = '.';
 
 const char OUT_OF_BOUNDS = 'o';
 

@@ -543,6 +543,7 @@ Creature::Creature(){ //constructor
     srand(time(NULL));
     this->power = (rand()%MAX_POWER)+1; //every entity is given a random power from 1-MAX_POWER
     this->defense = (rand()%MAX_DEFENSE)+1; //every entity is given a random defense from 1-MAX_DEFENSE
+    this->potions = (rand()%MAX_POTIONS)+1;//every entity is given a random number of potions from 1-MAX_POTIONS
 }   
 Creature::~Creature(){
 
