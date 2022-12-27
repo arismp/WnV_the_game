@@ -1,0 +1,53 @@
+  Blueprint λογισμικού.
+
+
+
+Οι κλάσεις :
+
+
+class Position : Αυτή η κλάση αντιπροσωπεύει τη θέση ενός entiy στο grid, έχει ως private member ένα struct το οποίο περιέχει 
+δύο int x,y τα οποία είναι οι συντεταγμένες στο grid και ένα pointer σε αυτό το struct για εύκολο access. (Objects απ'ο αυτή την κλάση στη συνέχεια
+χρησιμοποιούνται από άλλες κλάσεις όπως character η οποία έχει ως μέλος της ένα pointer σε object της κλάσης αυτής το οποίο το κληρονομούν 
+οι κλάσεις avatar Creature( και επομένως vampire/werewolf) ώστε να έχουν τη θέση του entity στο grid.)
+
+class Grid : Αυτή η κλάση χειρίζεται τον χάρτη/grid του παιχνιδιού. Έχει ως private μέρος τις διαστάσεις(ύψος/πλάτος) του grid,
+έναν 2d array από χαρακτήρες ο οποίος είναι το ίδιο το grid, τον αριθμό των δέντρων και των water puddles, τον αριθμό καθενός entity(vampire/werewolf)
+ένα int μετρητή που μετράει τα frames για το πότε θα αλλάξει η ώρα(μέρα - νύχτα) και ένα χαρακτήρα που δείχνει αν είναι μέρα ή νύχτα.
+Πολλές κλάσεις όπως avatar Creature vampire character Game Entities θα έχουν access σε ένα pointer σε object της κλάσης αυτής για να γίνεται πάντα update το grid.
+
+class character : Αυτή η κλάση έχει ως private μέρος ένα pointer σε object της κλάσης Position το οποίο θα είναι το position στο grid  
+του entity και ένα char Species το οποίο είναι το symbol του entity στο grid. Στο public μέρος έχει τις αντίστοιχες μεθόδους τις οποίες
+κληρονομούν οι κλάσεις avatar Creature( και επομένως vampire και werewolf). 
+
+class Creature : Αυτή η κλάση κληρονομεί το public μέρος της κλάσης character και περιέχει τα στοιχεία που θα χρειαστούν και οι vampires και 
+οι werewolves όπως health power potions defense και στη συνέχεια περιέχει στο public μέρος της μεθόδους κίνησης στο grid για up,down,right,left
+movement το οποίο κάνουν και οι δύο οντότητες (vampires/werewolves).
+
+class werewolf : κληρονομεί το public μέρος της Creature και επομένως της character. Και περιέχει μεθόδους για τα υπόλοιπα actions που μπορεί να
+κάνει (attack,heal_teammate,dodge etc.).
+
+class vampire : κληρονομεί το public μέρος της Creature και επομένως της character. Και περιέχει μεθόδους για τα υπόλοιπα actions που μπορεί να
+κάνει (attack,heal_teammate,dodge etc.). Επίσης περιέχει της μεθόδους διαγώνιας κίνησης την οποία μόνο οι vampires μπορούν να κάνουν.
+
+class avatar : περιέχει στο private μέρος της πληροφορίες όπως τα potions που διαθέτει ο παίχτης και ποιά είναι η ομάδα του.
+Κληρονομεί το public μέρος της κλάσης character και έχει μεθόδους κίνησης στο grid με βάση το input και μία μέθοδο που γιατρεύει την ομάδα του.
+
+How the inheritance between the these classes works:
+
+
+class character                         class character
+class avatar                                 / \
+class Creature   ------------>              /   \
+class werewolf                  class avatar    class Creature   (public character)
+class vampire                                         / \
+                                                     /   \
+                                        class werewolf    class vampire (public Creature)
+
+
+class Entities : Αυτή η κλάση χειρίζεται τις οντότητες vampires/werewolves, έχει ως private μέρος δύο counters(πλήθος vapmires/werewolves)
+και δύο vcectors από pointers σε objects των κλάσεων vampire/werewolf. Δηλαδή αποθηκεύουν όλες τους ενεργούς vampires/werewolves.
+Επίσης χειρίζεται το movement τους.
+
+class Game : Αυτή η κλάση χειρίζεται το παιχνίδι. Έχει ως private μέρος μία flag μεταβλητή η οποία ελέγχει το while loop του παιχνιδιού.
+Έχει τις κατάλληλες μεθόδους για τον χειρισμό του παιχνιδιού. Έχει access σε pointers από objects των κλάσεων avatar Entities Grid για
+τη λειτουργία του παιχνιδιού.
