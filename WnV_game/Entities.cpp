@@ -703,3 +703,16 @@ bool character::isInBoundary(Grid *grid){
     if(x == 0 || y == 0 || x == grid->getX()-1 || y == grid->getY()-1) return true;
     return false;
 }                  
+
+/*
+How the inheritance between the these classes works:
+
+class character                         class character
+class avatar                                 / \
+class Creature   ------------>              /   \
+class werewolf                  class avatar    class Creature
+class vampire                                         / \
+//                                                   /   \
+//                                       class werewolf   class vampire
+*/
+
