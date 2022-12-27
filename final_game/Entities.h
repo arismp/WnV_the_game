@@ -84,7 +84,7 @@ class Creature: public character{
         int Pick_Random_Movement();
         void Movement(Grid *grid);
 
-        void CheckSourroundings(Grid *gptr, char *AdjType, int AdjPos[][2]);
+        void CheckSourroundings(Grid *gptr, char *AdjType, int **AdjPos);
 
 };
 
@@ -96,7 +96,7 @@ class werewolf: public Creature{
 
         void Heal(werewolf *w);
         void Attack(vampire *v);
-        void Dodge(char *AdjType, int AdjPos[][2]);
+        void Dodge(char *AdjType, int **AdjPos);
     
 };
 
@@ -114,7 +114,7 @@ class vampire: public Creature{
 
         void Heal(vampire *v);
         void Attack(werewolf *w);
-        void Dodge(char *AdjType, int AdjPos[][2]);
+        void Dodge(char *AdjType, int **AdjPos);
 
 };
 
