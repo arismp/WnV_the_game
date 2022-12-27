@@ -3,8 +3,6 @@
 #ifndef Grid_H
 #define Grid_H
 
-// #include "Entities.h"
-// #include "Game.h"
 //this is a class of a single position in the grid/map
 //as its private member it has the coordinates of that position 
 class Position{

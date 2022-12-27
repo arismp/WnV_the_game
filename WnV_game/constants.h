@@ -3,14 +3,6 @@
 #define constants_H
 
 
-/*
-const char UP = 65;   //Up movement
-const char DOWN = 66; //Down movement 
-const char RIGHT = 67; //rigth movement
-const char LEFT = 68; //left movement 
-*/
-
-
 const char UP = 'w';   //Up movement
 const char DOWN = 's'; //Down movement 
 const char RIGHT = 'd'; //rigth movement
