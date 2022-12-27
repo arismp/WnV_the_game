@@ -481,7 +481,7 @@ void vampire::Attack(werewolf *w){
     int wdefense = w->GetDefense();
     int vattack = this->GetPower();
     if(vattack > wdefense){
-        std::cout << "Vampire attacks!" << std::endl;
+        // std::cout << "Vampire attacks!" << std::endl;
         int damage = abs(vattack - wdefense);
         w->SetHealth(w->GetHealthState() - damage);
     }
@@ -519,7 +519,7 @@ void werewolf::Attack(vampire *v){
     int vdefense = v->GetDefense();
     int wattack = this->GetPower();
     if(wattack > vdefense){
-        std::cout << "Werewolf attacks!" << std::endl;
+        // std::cout << "Werewolf attacks!" << std::endl;
         int damage = abs(wattack - vdefense);
         v->SetHealth(v->GetHealthState() - damage);
     }
