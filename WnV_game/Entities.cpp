@@ -71,7 +71,8 @@ werewolf *Entities::GetWolf(int x, int y){
 }
 
 //this function handles the movement of each entity (vampire/werewolf) in the game 
-//it iterates through the vectors and for each object it makes a movement 
+//it iterates through the vectors and for each object it makes a movement
+/* 
 void Entities::EntitiesMovement(Grid *grid){
     std::vector<vampire *>::iterator viter;
     std::vector<werewolf *>::iterator witer;
@@ -82,6 +83,29 @@ void Entities::EntitiesMovement(Grid *grid){
         (*witer)->Movement(grid);
     }            
 }
+*/
+void Entities::EntitiesMovement(Grid *grid){  //maybe split that function 
+    std::vector<vampire *>::iterator viter;
+    std::vector<werewolf *>::iterator witer;
+    int randomteamturn = (rand()%2)+1; //random turn to decide which team plays first each time
+    if(randomteamturn == 1){ //if =1 vapmires play first 
+        for(viter = this->VampVector.begin(); viter != this->VampVector.end(); ++viter){
+            (*viter)->VampireMovement(grid);
+        }
+        for(witer = this->WolfVector.begin(); witer != this->WolfVector.end(); ++witer){
+            (*witer)->Movement(grid);
+        }  
+    }   
+    else{ //if =2 werewolves play first
+        for(witer = this->WolfVector.begin(); witer != this->WolfVector.end(); ++witer){
+            (*witer)->Movement(grid);
+        } 
+        for(viter = this->VampVector.begin(); viter != this->VampVector.end(); ++viter){
+            (*viter)->VampireMovement(grid);
+        }                                 
+    }       
+}
+
 
 void Entities::EntitiesAction(Grid *grid){
     std::vector<vampire *>::iterator viter;
