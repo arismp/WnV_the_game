@@ -53,7 +53,6 @@ class Grid{
         int getY();
         int TotalEntitiesNum();
         void UpdateGrid(int x,int y,char Ch);
-        /////////////////////////////////  bool isLand(Position *pos);
         bool isPotion(int x,int y);
 };
 
