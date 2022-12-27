@@ -26,4 +26,4 @@ clean:
 	rm -f $(TARGET) $(OBJECTS)
 
 run:  
-	./game 20 20 
+	./game 20 20

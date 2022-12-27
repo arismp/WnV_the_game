@@ -16,6 +16,7 @@ class Position{
         struct Cord *cord;
     public:
         Position();
+        ~Position();
         struct Cord * GetPosition();
         void SetNewPosition(int newx,int newy);
 

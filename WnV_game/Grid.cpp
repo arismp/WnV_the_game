@@ -9,6 +9,9 @@ Position::Position(){
     this->cord->x = -1;
     this->cord->y = -1; 
 }
+Position::~Position(){
+    delete this->cord;
+}
 
 struct Position::Cord *Position::GetPosition(){ return this->cord; }
 
@@ -29,7 +32,7 @@ Grid::Grid(int X,int Y){       //construct the grid
     if(startingtime == 1) this->Day_n_Night_Cycle = 'N';   
     else this->Day_n_Night_Cycle = 'D';      
     this->Cycle_count = 0;  
-    this->EntitiesNum = (this->x * this->y)/30; //the number of vampires/werewolves is equal to (x*y)/30
+    this->EntitiesNum = (this->x * this->y)/15; //the number of vampires/werewolves is equal to (x*y)/15
 }
 void Grid::Init(){   //initialize the grid and allocate memory for it 
     int i;

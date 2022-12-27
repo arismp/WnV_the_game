@@ -11,7 +11,8 @@ class Game{
     private:
         bool flag; //flag that handles the gameplay loop 
     public:
-        Game(){ this->flag = true; }
+        Game();
+        ~Game();
         Grid CreateWorld(int x,int y);
         bool GameOver(Entities *ent);
         void CreateGame(int x,int y);

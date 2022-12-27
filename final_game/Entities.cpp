@@ -1,6 +1,7 @@
 #include <cstdlib>
 #include <vector>
 #include <iostream>
+#include <algorithm>
 
 #include "constants.h"
 #include "Entities.h"
@@ -96,8 +97,10 @@ void Entities::EntitiesAction(Grid *grid){
         int curPotions = (*viter)->GetPotions();
 
         char *AdjType = new char[4]; // array that stores the type of the entities in all adjacent positions to the vampire's current position
-        int AdjPos[4][2]; // array that stores the coordinates of all adjacent positions to the vampire's current position
-        
+        int **AdjPos = new int*[4]; // array that stores the coordinates of all adjacent positions to the vampire's current position
+        for(int i=0; i<4; ++i){
+            AdjPos[i] = new int[2];
+        }
         // Adjacent Position Initialization
         //Up
         AdjPos[0][0] = curX-1;
@@ -117,50 +120,101 @@ void Entities::EntitiesAction(Grid *grid){
 
         for(int i=0; i<4; i++){
             if(AdjType[i] == VAMPIRE){
-                // vampire *AdjV = GetVamp(AdjPos[i][0], AdjPos[i][1]);
-                // int vhealth = AdjV->GetHealthState();
                 (*viter)->Heal(GetVamp(AdjPos[i][0], AdjPos[i][1]));
-                // (*viter)->DecreasePotions();
             }
             else if(AdjType[i] == WEREWOLF){
                 werewolf *wolf = GetWolf(AdjPos[i][0], AdjPos[i][1]);
 
-
                 int wp = wolf->GetPower();
                 int vp = (*viter)->GetPower();
 
-                if(vp >= wp) 
+                if(vp >= wp){ 
                     (*viter)->Attack(wolf); 
                     if((wolf->GetHealthState()) <= 0){
-                        //find wolf's index in vector
+                        // find wolf's index in vector
                         for(int i=0; i<WolfVector.size(); ++i){
-                            if(WolfVector[i] == wolf)
-                            break;
+                            if(WolfVector[i] == wolf){
+                                std::cout << "Found him\n";
+                                break;
+                            }
                         }
                         //vectorpop
-                        // WolfVector.erase(remove(WolfVector.begin(), WolfVector.end(), wolf), WolfVector.end());
-                        WolfVector.erase(WolfVector.begin()+i);
-                        //vector Size? wolf count 
-
+                        WolfVector.erase(remove(WolfVector.begin(), WolfVector.end(), wolf), WolfVector.end());
                         grid->UpdateGrid(AdjPos[i][0], AdjPos[i][1],'.');
 
                     }
+                }
                 else
                     (*viter)->Dodge(AdjType, AdjPos);
 
             }
         }
     }
-    //for every werewolf
-    // for(witer = this->WolfVector.begin(); witer != this->WolfVector.end(); ++witer){
-    //     // (*witer)->CheckSourroundings(grid);
+    // for every werewolf
+    for(witer = this->WolfVector.begin(); witer != this->WolfVector.end(); ++witer){
+
+        Position * pos = (*witer)->GetEntityPosition();
+        int curX = pos->GetPosition()->x;
+        int curY = pos->GetPosition()->y;
+        int curHealth = (*witer)->GetHealthState();
+        int curPotions = (*witer)->GetPotions();
+
+        char *AdjType = new char[4]; // array that stores the type of the entities in all adjacent positions to the vampire's current position
+        int **AdjPos = new int*[4]; // array that stores the coordinates of all adjacent positions to the vampire's current position
+        for(int i=0; i<4; ++i){
+            AdjPos[i] = new int[2];
+        }        
+        // Adjacent Position Initialization
+        //Up
+        AdjPos[0][0] = curX-1;
+        AdjPos[0][1] = curY;
+        //Down
+        AdjPos[1][0] = curX+1;
+        AdjPos[1][1] = curY;
+        //Left
+        AdjPos[2][0] = curX;
+        AdjPos[2][1] = curY-1;
+        //Right 
+        AdjPos[3][0] = curX;
+        AdjPos[3][1] = curY+1;
 
 
+        (*witer)->CheckSourroundings(grid, AdjType, AdjPos);
+
+        for(int i=0; i<4; i++){
+            if(AdjType[i] == WEREWOLF){
+                (*witer)->Heal(GetWolf(AdjPos[i][0], AdjPos[i][1]));
+            }
+            else if(AdjType[i] == VAMPIRE){
+                vampire *vamp = GetVamp(AdjPos[i][0], AdjPos[i][1]);
 
 
-    // }            
+                int vp = vamp->GetPower();
+                int wp = (*witer)->GetPower();
 
+                if(wp >= vp){ 
+                    (*witer)->Attack(vamp); 
+                    if((vamp->GetHealthState()) <= 0){
+                        //find wolf's index in vector
+                        for(int i=0; i<VampVector.size(); ++i){
+                            if(VampVector[i] == vamp){
+                                break;
+                            }
+                        }
+                        //vectorpop
+                        VampVector.erase(remove(VampVector.begin(), VampVector.end(), vamp), VampVector.end());
+                        grid->UpdateGrid(AdjPos[i][0], AdjPos[i][1],'.');
 
+                    }
+                }
+                else{
+                    (*witer)->Dodge(AdjType, AdjPos);
+                }
+
+            }
+        }
+    }
+            
 
 }
         
@@ -171,6 +225,10 @@ avatar::avatar(){ //constructor
     std::cout << "Pick a team : " << std::endl << "Press : 'W' for Werewolves / 'V' for Vampires." << std::endl;
     char team;
     std::cin >> team;
+    while(team != 'W' && team != 'V'){
+        std::cout <<"Need to press 'W' or 'V!" << std::endl;
+        std::cin >> team;
+    }    
     this->Team=team; 
     this->SetSpecies(this->Team);  
 }
@@ -421,7 +479,7 @@ void vampire::Attack(werewolf *w){
     }
 }
 
-void vampire::Dodge(char *AdjType, int AdjPos[][2]){
+void vampire::Dodge(char *AdjType, int **AdjPos){
     for(int i=0; i<4; ++i){
     if(AdjType[i] == '.'){
         this->UpdatePosition(AdjPos[i][0],AdjPos[i][1]);
@@ -454,7 +512,7 @@ void werewolf::Attack(vampire *v){
     }
 }
 
-void werewolf::Dodge(char *AdjType, int AdjPos[][2]){
+void werewolf::Dodge(char *AdjType, int **AdjPos){
     for(int i=0; i<4; ++i){
     if(AdjType[i] == '.'){
         this->UpdatePosition(AdjPos[i][0],AdjPos[i][1]);
@@ -573,9 +631,18 @@ void Creature::Movement(Grid *grid){
 
 
 //checks the entity's sourrounding positions 
-void Creature::CheckSourroundings(Grid *gptr, char *AdjType, int AdjPos[][2]){
+void Creature::CheckSourroundings(Grid *gptr, char *AdjType, int **AdjPos){
+    int x, y;
     for(int i=0; i<4; i++){
-        AdjType[i] = gptr->AccessGridPosition(AdjPos[i][0], AdjPos[i][1]);
+        x = AdjPos[i][0];
+        y = AdjPos[i][1];
+        if((x >= 0 && x <= gptr->getX()-1) && (y >= 0 && y <= gptr->getY()-1)){
+            AdjType[i] = gptr->AccessGridPosition(AdjPos[i][0], AdjPos[i][1]);
+        }
+        else{
+            AdjType[i] = OUT_OF_BOUNDS;
+        }
+        // std::cout << "AdjT 0" << AdjType[0];
     }
 }
 

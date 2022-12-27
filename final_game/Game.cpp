@@ -2,8 +2,9 @@
 #include <unistd.h>
 
 #include "constants.h"
-#include "Entities.h"
+// #include "Entities.h"
 #include "Game.h"
+// #include "Grid.h"
 
 
 //this function waits for the player to press 'S' to start the gameplay 
@@ -77,14 +78,33 @@ void Game::GamePlay(Grid *gptr,avatar *player,Entities * ent){
             //after the player's movement the other entities move 
             srand(time(NULL));
             ent->EntitiesMovement(gptr);
+            ent->EntitiesAction(gptr);
             //increase the cycle count after each frame
             gptr->IncreaseCycleCount();
             gptr->ShowGrid();
             //usleep(100000); 
             usleep(50000);
+
+            // CheckGameStatus();
         }
 
     }
+}
+//this method checks the status of each team and determines if the game has ended
+void Game::CheckGameStatus(Entities *ent){
+
+    int vampNum = ent->GetVampCount();
+    int wolfNum = ent->GetWolfCount();
+    
+    if(vampNum == 0){
+        std::cout << "All vampires have been defeated." << std::endl;
+        std::cout << "Werewolves win!!!" << std::endl; 
+    }
+    else if(wolfNum == 0){
+        std::cout << "All werewolves have been defeated." << std::endl;
+        std::cout << "Vampires win!!!" << std::endl; 
+    }
+
 }
 
 

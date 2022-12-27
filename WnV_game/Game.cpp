@@ -5,6 +5,8 @@
 #include "Entities.h"
 #include "Game.h"
 
+Game::Game(){ this->flag = true; }
+Game::~Game(){  }
 
 //function that creates the word/map
 Grid Game::CreateWorld(int x,int y){
@@ -46,12 +48,12 @@ void Game::DisplayGameStats(Entities *ent,avatar *player){
 bool Game::GameOver(Entities *ent){
     ent->UpdateCount();
     if(ent->GetVampCount() == 0){
-        std::cout << "The werewolves have won!!" << std::endl;
+        std::cout << "\nThe werewolves have won!!" << std::endl;
         this->flag = false;
         return true;
     }
     else if(ent->GetWolfCount() == 0){
-        std::cout << "The vampires have won!!" << std::endl;
+        std::cout << "\nThe vampires have won!!" << std::endl;
         this->flag = false;
         return true; 
     }
@@ -81,14 +83,15 @@ void Game::GamePlay(Grid *gptr,avatar *player,Entities * ent){
 
 
     char input;
-    //srand(time(NULL));
+    srand(time(NULL));
 
     //loop while the player presses 'Q' or a team has lost
     while(this->flag){
 
         //the entities move (vampires/werewolves)
-        //srand(time(NULL));
+        srand(time(NULL));
         ent->EntitiesMovement(gptr);
+        ent->EntitiesAction(gptr);
         
         gptr->ChangeCycle();   //this function changes the day and night cycle
 

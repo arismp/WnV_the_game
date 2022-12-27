@@ -4,10 +4,12 @@
 #define Game_H
 
 #include "constants.h"
+#include "Grid.h"
+#include "Entities.h"
 
 
 //function prototype
-Grid CreateWorld(int x,int y);
+// Grid CreateWorld(int x,int y);
 
 
 //this class handles the game stats that will be displayed when the game is paused
@@ -44,5 +46,7 @@ class Game{
         void Pause(Entities *en,Statistics *stats,avatar * player);
         void Resume(avatar *player);
         void GamePlay(Grid *gptr,avatar *player,Entities * ent);
+        void CheckGameStatus(Entities *ent);
 };
+
 #endif

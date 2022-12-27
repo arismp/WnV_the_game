@@ -1,3 +1,4 @@
+//this file contains all the constants uesd in the making of the game
 #ifndef constants_H
 #define constants_H
 
@@ -25,6 +26,8 @@ const char VAMPIRE = 'v';
 
 const char WATER = '=';
 const char TREE = 'T';
-const char EARTH = ' ';
+const char EARTH = '.';
+
+const char OUT_OF_BOUNDS = 'o';
 
 #endif
